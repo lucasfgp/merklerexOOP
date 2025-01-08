@@ -56,9 +56,18 @@ void MerkelMain::printMarketStats()
         std::vector<OrderBookEntry> entries = orderBook.getOrders(OrderBookType::ask, 
                                                                   p,
                                                                   currentTime );
+        std::vector<OrderBookEntry> entriesTest = orderBook.getOrdersTest(OrderBookType::ask, 
+                                                                  p,
+                                                                  currentTime );
         std::cout << "Asks seen: " << entries.size() << std::endl;
         std::cout << "Max ask: " << OrderBook::getHighPrice(entries) << std::endl;
         std::cout << "Min ask: " << OrderBook::getLowPrice(entries) << std::endl;
+        std::cout << "Avg price: " << OrderBook::getAvgPrice(entries) << std::endl;
+        std::cout << "Avg price test: " << OrderBook::getAvgPrice(entriesTest) << std::endl;
+        std::cout << "Weighted Average Price: " << OrderBook::getWeightedAvgPrice(entries) << std::endl;
+        // Calculate the total volume for orders with a specific price (e.g., 10.0)
+        // double totalVolume = orderBook.getVolumeForPrice(entries, pPrice);
+        // std::cout << "Total volume for price " << totalVolume << totalVolume << std::endl;
         
 
     }
