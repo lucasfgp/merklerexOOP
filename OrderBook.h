@@ -16,6 +16,11 @@ class OrderBook
         std::vector<OrderBookEntry> getOrders(OrderBookType type,
                                               std::string product,
                                               std::string timestamp);
+        std::vector<OrderBookEntry> getOrdersTest(OrderBookType type,
+                                              std::string product,
+                                              std::string timestamp);
+
+        
 
 
         /** returns the earliest time in the orderbook */
@@ -25,9 +30,12 @@ class OrderBook
          * If there is no next timestamp,
          * wraps around to the start */
         std::string getNextTime(std::string timestamp);
+        double getVolumePrice(std::vector<OrderBookEntry>& orders);
+        static double getWeightedAvgPrice(std::vector<OrderBookEntry>& orders);
 
         static double getHighPrice(std::vector<OrderBookEntry>& orders);
         static double getLowPrice(std::vector<OrderBookEntry>& orders);
+        static double getAvgPrice(std::vector<OrderBookEntry>& orders);
 
     
     private:
