@@ -2,6 +2,7 @@
 #include "CSVReader.h"
 #include <map>
 #include <unordered_map>
+#include <functional>
 
 OrderBook::OrderBook(std::string filename)
 {
@@ -160,4 +161,82 @@ std::string OrderBook::getNextTime(std::string timestamp)
     }
 
     return next_timestamp;
+}
+
+void OrderBook::insertOrder(OrderBookEntry& order)
+{
+    orders.push_back(order);
+    std::sort(orders.begin(), orders.end(), OrderBookEntry::compareByTimestamp);
+}
+
+std::vector<OrderBookEntry> OrderBook::matchAsksToBids(std::string product, std::string timestamp)
+{
+    // the function takes two strings and it's process basically is going to match
+    // in a particular time window for a particular product (because we always match the same product to the same product)
+    // We pull out two sets of order book items from the orders.
+    std::vector<OrderBookEntry> asks = getOrders(OrderBookType::ask,
+                                              product,
+                                              timestamp);
+
+    std::vector<OrderBookEntry> bids = getOrders(OrderBookType::bid,
+                                              product,
+                                              timestamp);
+
+    // We then create a data structure that can store our sales so we can capture those
+    std::vector<OrderBookEntry> sales;
+
+
+    // We sort the asks by ascending price
+    std::sort(asks.begin(), asks.end(), OrderBookEntry::compareByPriceAsc);
+    // And sort the bids by descending price
+    std::sort(bids.begin(), bids.end(), OrderBookEntry::compareByPriceDesc);
+
+    // Now I've laid out, so iterating over the asks and then for every ask I iterated
+    // through all the bids and I then, if we've got a match, we generate a sale
+    // and then we have three possible scenarios which we deal with.
+    for(OrderBookEntry& ask : asks)
+    {
+        for(OrderBookEntry& bid : bids)
+        {
+            if(bid.price >= ask.price)
+            {
+                OrderBookEntry sale{ask.price, 0, timestamp, product, OrderBookType::sale};
+
+
+                if(bid.amount == ask.amount)
+                {
+                    sale.amount = ask.amount;
+                    sales.push_back(sale);
+
+                    bid.amount = 0;
+
+                    break;
+                }
+
+                if(bid.amount > ask.amount)
+                {
+                    sale.amount = ask.amount;
+                    sales.push_back(sale);
+
+                    bid.amount = bid.amount - ask.amount;
+
+                    break;
+                }
+
+                if(bid.amount < ask.amount)
+                {
+                    sale.amount = bid.amount;
+                    sales.push_back(sale);
+
+                    ask.amount = ask.amount - bid.amount;
+
+                    bid.amount = 0;
+
+                    continue;
+                }
+            }
+        }
+    }
+
+    return sales;
 }

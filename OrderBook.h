@@ -30,6 +30,11 @@ class OrderBook
          * If there is no next timestamp,
          * wraps around to the start */
         std::string getNextTime(std::string timestamp);
+
+        void insertOrder(OrderBookEntry& order);
+
+        std::vector<OrderBookEntry> matchAsksToBids(std::string product, std::string timestamp);
+
         double getVolumePrice(std::vector<OrderBookEntry>& orders);
         static double getWeightedAvgPrice(std::vector<OrderBookEntry>& orders);
 

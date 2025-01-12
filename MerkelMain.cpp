@@ -116,6 +116,7 @@ void MerkelMain::enterAsk()
                 tokens[0],
                 OrderBookType::ask
             );
+            orderBook.insertOrder(obe);
         }catch (const std::exception& e)
         {
             std::cout << "MerkelMain::enterAsk() Bad input " << std::endl;
